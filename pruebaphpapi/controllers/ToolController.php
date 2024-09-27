@@ -4,7 +4,7 @@ require_once(__DIR__ . "/../models/Tools.php");
 
 class ToolController
 {
-    public function GetToolsList()
+    public function ToolsList()
     {
       try {
         $tools = [

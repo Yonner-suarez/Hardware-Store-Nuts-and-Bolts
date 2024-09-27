@@ -6,17 +6,15 @@ error_reporting(E_ALL);
 
 require_once(__DIR__ . "/Routes/Router.php");
 require_once(__DIR__ . "/config.php");
+require_once(__DIR__ . "/infraestructure/middleware.php");
 
-// Middleware para devolver JSON
-function jsonMiddleware($response) {
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit();
+try{
+  $router = new Router();
+  $response = $router->matchRoute($uri);
+  Middleware::jsonMiddleware($response);
+}catch(Exception $e){
+  Middleware::jsonMiddleware(["error" => $e->getMessage(), "code" => $e->getCode(), "dara" => null]);
 }
-
-$router = new Router();
-$response = $router->matchRoute($uri);
-jsonMiddleware($response);
 
 
 
@@ -28,6 +26,13 @@ jsonMiddleware($response);
 //<Directory /ruta/a/tu/sitio/web>
 //    AllowOverride All
 //</Directory>
+
+/*
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+*/
 
 
 
