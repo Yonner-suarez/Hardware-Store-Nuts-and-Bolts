@@ -23,7 +23,7 @@ class AuthController{
         break;
     }
 
-    $password = 'JsQ1049658632**';//! TODO viene de la base de datos    
+    $password = 'admin123';//! TODO viene de la base de datos    
     if(password_verify($password, $request['password'])) return Middleware::getToken($request['tipoPersona'], $request['correo'], $request['username']);
     else return "false";
   }
