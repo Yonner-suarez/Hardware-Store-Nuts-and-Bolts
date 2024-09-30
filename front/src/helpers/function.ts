@@ -22,3 +22,10 @@ export const obtenerNombreCiudad = async (
     throw "Algo salió mal";
   }
 };
+export async function getTokenFromLocalStorage(): Promise<string | null> {
+  //localStorage.setItem("user", JSON.stringify({ token: "aqui el token" }));
+  const userString = localStorage.getItem("user");
+  if (!userString) return null;
+  const user = JSON.parse(userString);
+  return user?.token || null;
+}

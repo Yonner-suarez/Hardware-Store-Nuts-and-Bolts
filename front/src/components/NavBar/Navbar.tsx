@@ -23,7 +23,6 @@ const Navbar: React.FC = () => {
       setIsPerfil("");
     } else {
       const partes = correo.split(" ");
-      console.log(partes);
       if (partes.length > 0) {
         const iniciales = partes[0][0] + partes[1][0];
         setIsPerfil(iniciales);
