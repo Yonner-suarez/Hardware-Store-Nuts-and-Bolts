@@ -104,3 +104,6 @@
   font-size: 18px;
   font-weight: 600;
 }
+.span_nabvar_profile_style:hover {
+  cursor: pointer;
+}

@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 
 const Navbar: React.FC = () => {
   const profileImage = "";
-  const [isLogged, setIsLogged] = useState(false);
+  const [isLogged, setIsLogged] = useState(true);
   const [NameAccount, setNameAccount] = useState("Julieth");
   const [searchTerm, setSearchTerm] = useState("");
   const [coordenadas, setCoordenadas] = useState({});
@@ -97,7 +97,7 @@ const Navbar: React.FC = () => {
               </p>
               <span
                 className={styles.span_navbar_style}
-                onClick={() => setIsLogged(!isLogged)}
+                onClick={() => {}}
                 role="button"
               >
                 {ciudad !== "" ? ciudad : "Ubicación"}
@@ -110,7 +110,7 @@ const Navbar: React.FC = () => {
             src={shoppingBag}
             alt="Shopping Bag"
             className="img-all-navbar-style"
-            onClick={() => setIsLogged(!isLogged)}
+            onClick={() => {}}
           />
         </li>
         <li className={styles.nav_item_style}>
@@ -121,7 +121,7 @@ const Navbar: React.FC = () => {
                   src={profileImage}
                   alt="profile"
                   className="img_nabvar_profile_style"
-                  onClick={() => setIsLogged(!isLogged)}
+                  onClick={() => {}}
                 />
               ) : (
                 <span className={styles.span_nabvar_profile_style}>
@@ -133,7 +133,7 @@ const Navbar: React.FC = () => {
                 src={account}
                 alt="Account"
                 className="img-all-navbar-style"
-                onClick={() => setIsLogged(!isLogged)}
+                onClick={() => {}}
               />
             )}
             <span className={styles.span_navbar_style}>
