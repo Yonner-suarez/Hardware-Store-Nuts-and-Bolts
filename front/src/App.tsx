@@ -7,6 +7,7 @@ import Cotizaciones from "./pages/cotizaciones/Cotizaciones";
 import Loader from "./components/Loader/Loader";
 import { getTokenFromLocalStorage } from "./helpers/function";
 import Home from "./pages/Home/Home";
+import ModalRegister from "./components/ModalRegister/ModalRegister";
 
 function App() {
   const [showLoading, setShowLoading] = useState({ display: "none" });
@@ -33,6 +34,10 @@ function App() {
         <Route
           path="/HardawareStore/cotizaciones/generar"
           element={<Cotizaciones />}
+        />
+        <Route
+          path="/HardwareStore/register/user"
+          element={<ModalRegister />}
         />
       </Routes>
       <Footer />

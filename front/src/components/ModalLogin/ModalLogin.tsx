@@ -1,9 +1,15 @@
 import checkUser from "../../../assets/tabler--user-check.svg";
 import check from "../../../assets/mdi--tag-check.svg";
-import styles from "./ModalRegisterLogin.module.css";
+import styles from "./ModalLogin.module.css";
 import logo from "../../../assets/pepicons-pencil--hammer-claw-circle-filled.svg";
 import { GoogleLogin } from "@react-oauth/google";
-const ModalRegisterLogin: React.FC = () => {
+import { useNavigate } from "react-router-dom";
+
+const ModalLogin: React.FC = () => {
+  const navigate = useNavigate();
+  const FormRegister = () => {
+    navigate("/HardwareStore/register/user");
+  };
   return (
     <>
       <div
@@ -178,6 +184,7 @@ const ModalRegisterLogin: React.FC = () => {
                       type="button"
                       className="btn btn-light"
                       style={{ border: "1px solid #004876" }}
+                      onClick={FormRegister}
                     >
                       Registrarse
                     </button>
@@ -211,4 +218,4 @@ const ModalRegisterLogin: React.FC = () => {
   );
 };
 
-export default ModalRegisterLogin;
+export default ModalLogin;

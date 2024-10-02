@@ -1,0 +1,16 @@
+.a_terminos_condiciones {
+  color: #004876;
+  text-decoration: underline;
+}
+.a_terminos_condiciones:hover {
+  cursor: pointer;
+}
+.hideNumberInputSpinners::-webkit-outer-spin-button,
+.hideNumberInputSpinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hideNumberInputSpinners {
+  -moz-appearance: textfield;
+}

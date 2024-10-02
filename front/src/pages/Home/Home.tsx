@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import ModalRegisterLogin from "../../components/modalRegisterLogin/ModalRegisterLogin";
+import ModalRegisterLogin from "../../components/ModalLogin/ModalLogin";
 import { Modal } from "bootstrap";
 
 const Home: React.FC = () => {
