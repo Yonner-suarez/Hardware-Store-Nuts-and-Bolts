@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 
 const Navbar: React.FC = () => {
   const profileImage = "";
-  const [isLogged, setIsLogged] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
   const [NameAccount, setNameAccount] = useState("Julieth");
   const [searchTerm, setSearchTerm] = useState("");
   const [coordenadas, setCoordenadas] = useState({});

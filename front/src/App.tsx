@@ -3,9 +3,11 @@ import { Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/NavBar/Navbar";
 import Footer from "./components/Footer/Footer";
-import Cotizaciones from "./pages/Cotizaciones";
+import Cotizaciones from "./pages/cotizaciones/Cotizaciones";
 import Loader from "./components/Loader/Loader";
 import { getTokenFromLocalStorage } from "./helpers/function";
+import Home from "./pages/Home/Home";
+
 function App() {
   const [showLoading, setShowLoading] = useState({ display: "none" });
 
@@ -27,12 +29,11 @@ function App() {
       ></Loader>
       <Navbar />
       <Routes>
-        <Route>
-          <Route
-            path="/HardawareStore/cotizaciones/generar"
-            element={<Cotizaciones />}
-          />
-        </Route>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/HardawareStore/cotizaciones/generar"
+          element={<Cotizaciones />}
+        />
       </Routes>
       <Footer />
     </>
