@@ -1,10 +1,21 @@
 //@ts-nocheck
-import { Form, Col, Row, Button, InputGroup } from "react-bootstrap";
+import {
+  Form,
+  Col,
+  Row,
+  Button,
+  InputGroup,
+  Placeholder,
+} from "react-bootstrap";
+import { ValidateFormFunc, disableButton } from "../../helpers/function";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import styles from "./ModalRegister.module.css";
 import eyeIcon from "../../../assets/fluent--eye-off-16-regular.svg";
 import Loader from "../Loader/Loader";
+import verifyIconError from "../../../assets/clarity--error-line.svg";
+import Select, { Input } from "react-select";
+import { useEffect } from "react";
 
 const ModalRegister: React.FC = () => {
   const [validated, setValidated] = useState(false);
@@ -14,10 +25,28 @@ const ModalRegister: React.FC = () => {
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
-    tipoDocumento: "",
+    defaultTipoDocumento: { value: -1, label: "--Tipo de documento--" },
+    opcionesTipoDocumento: [],
     numeroDocumento: "",
     numeroTelefono: "",
-    tipoContribuyente: "",
+    defaultTipoContribuyente: { value: -1, label: "--Tipo de contribuyente--" },
+    opcionesTipoContribuyente: [],
+    correoElectronico: "",
+    departamento: "",
+    ciudad: "",
+    codigoPostal: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [validateForm, setValidateForm] = useState({
+    nombre: "",
+    apellido: "",
+    defaultTipoDocumento: { value: -1, label: "--Tipo de documento--" },
+    opcionesTipoDocumento: [],
+    numeroDocumento: "",
+    numeroTelefono: "",
+    defaultTipoContribuyente: { value: -1, label: "--Tipo de contribuyente--" },
+    opcionesTipoContribuyente: [],
     correoElectronico: "",
     departamento: "",
     ciudad: "",
@@ -26,302 +55,264 @@ const ModalRegister: React.FC = () => {
     confirmPassword: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-  const togglePasswordVisibility = (field: "password" | "confirmPassword") => {
-    if (field === "password") {
-      setShowPassword(!showPassword);
-    } else {
-      setShowConfirmPassword(!showConfirmPassword);
-    }
-  };
+  useEffect(() => {
+    setForm({
+      ...form,
+      opcionesTipoDocumento: setOptionsSelect(
+        "defaultTipoDocumento",
+        TipoDocumento
+      ),
+      opcionesTipoContribuyente: setOptionsSelect(
+        "defaultTipoContribuyente",
+        TipoContribuyente
+      ),
+    });
+  }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log(form);
-    if (form.checkValidity() === false || !passwordsMatch) {
-      Swal.fire(
-        "Por favor, completa los campos requeridos y asegúrate de que las contraseñas coincidan."
+  // Función para manejar cambios en los inputs y selects
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    if (e.target === undefined) {
+      const { name } = e;
+      setForm({
+        ...form,
+        [name]: { value: e.value, label: e.label },
+      });
+      ValidateFormFunc(
+        { ...form, [name]: { value: e.value, label: e.label } },
+        validateForm,
+        setValidateForm
       );
-      event.stopPropagation();
     } else {
-      // Código existente para el caso de éxito
-      setShowLoading({ display: "block" });
-      setTimeout(() => {
-        setShowLoading({ display: "none" });
-        Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
-      }, 2000);
+      const { name, value } = e.target;
+      setForm({
+        ...form,
+        [name]: value,
+      });
+      ValidateFormFunc(
+        { ...form, [name]: value },
+        validateForm,
+        setValidateForm
+      );
     }
-    setValidated(true);
+  };
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Código existente para el caso de éxito
+    setShowLoading({ display: "block" });
+    setTimeout(() => {
+      setShowLoading({ display: "none" });
+      Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
+    }, 2000);
   };
 
   const abrirTerminosYCondiciones = () => {
     Swal.fire("Acá abre el pdf de terminos y condiciones!", "", "info");
   };
+
+  const abrir_input_span_verificator = (
+    Placeholder: string,
+    propValidar: string,
+    type: string,
+    name: string,
+    texto: string,
+    select: bool = false,
+    optionsSelect: Array,
+    defaultState: any
+  ) => {
+    if (!select)
+      return (
+        <div className={styles.d_rows}>
+          <input
+            className={styles.i_general_Style}
+            type={type}
+            name={name}
+            value={propValidar}
+            onChange={handleChange}
+            placeholder={Placeholder}
+          />
+          <span className={styles.sp_general_style}>
+            {texto !== "" && validateForm[name] !== "" ? (
+              <>
+                {texto}
+                <img
+                  src={verifyIconError}
+                  alt="verify_alert_error"
+                  style={{ width: "20px" }}
+                />
+              </>
+            ) : (
+              ""
+            )}
+          </span>
+        </div>
+      );
+    else
+      return (
+        <>
+          <div className={styles.d_rows}>
+            <label>{name}</label>
+            <Select
+              id={name}
+              name={name}
+              value={defaultState}
+              onChange={handleChange}
+              options={optionsSelect}
+              className={styles.select_general_style}
+            />
+          </div>
+          <span className={styles.sp_general_style}>
+            {texto !== undefined &&
+            defaultState?.value !== -1 &&
+            Placeholder ===
+              name.toLocaleLowerCase().trim().replace(/\s+/g, "") ? (
+              <>
+                {texto}
+                {texto !== "" ? (
+                  <img
+                    src={verifyIconError}
+                    alt="verify_alert_error"
+                    style={{ width: "20px" }}
+                  />
+                ) : (
+                  ""
+                )}
+              </>
+            ) : (
+              ""
+            )}
+          </span>
+        </>
+      );
+  };
+
+  const setOptionsSelect = (name, obj) => {
+    let defaultOption = [
+      {
+        value: 0,
+        label: "---",
+        name,
+      },
+    ];
+    let estadoTmp = [
+      ...defaultOption,
+      ...obj.map((client) => ({
+        name,
+        value: client.id,
+        label: client.name,
+      })),
+    ];
+    return estadoTmp;
+  };
+
   return (
     <>
       <Loader estilo={showLoading} />
       <div className={styles.div_completar_datos}>
         Completa tus datos para registrarte en la plataforma
-        <Form
-          noValidate
-          validated={validated}
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            width: "50%",
-            backgroundColor: "#d5dcf3",
-            marginLeft: "auto",
-            marginRight: "auto",
-            height: "100%",
-            borderRadius: "10px",
-          }}
-        >
-          {/* Nombre y apellido */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustom01">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                placeholder="Ej: Juan"
-                defaultValue="Juan"
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom02">
-              <Form.Label>Apellido</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                placeholder="Ej: Pérez"
-                defaultValue="Pérez"
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          {/* Tipo de documento y número de documento */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustom04">
-              <Form.Label>Tipo de documento</Form.Label>
-              <select
-                className="form-select"
-                aria-label="Default select example"
-                onChange={handleChange}
-                required
-              >
-                {TipoDocumento.map((item: any) => (
-                  <option value={item.id}>{item.name}</option>
-                ))}
-              </select>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom05">
-              <Form.Label>Número de documento</Form.Label>
-              <InputGroup hasValidation>
-                <Form.Control
-                  type="number"
-                  placeholder="Ej: 1234567890"
-                  aria-describedby="inputGroupPrepend"
-                  className={styles.hideNumberInputSpinners}
-                  required
-                  onChange={handleChange}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Por favor, proporciona un número de documento válido.
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
-          </Row>
-          {/* Número de teléfono y tipo de contribuyente */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustom06">
-              <Form.Label>Número de teléfono</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: 3123456789"
-                required
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback type="invalid">
-                Por favor, proporciona un número de teléfono válido.
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom07">
-              <Form.Label>Tipo de contribuyente</Form.Label>
-              <select
-                className="form-select"
-                aria-label="Default select example"
-                onChange={handleChange}
-              >
-                {TipoContribuyente.map((item: any) => (
-                  <option value={item.id}>{item.name}</option>
-                ))}
-              </select>
-              <Form.Control.Feedback type="invalid">
-                Por favor, proporciona un tipo de contribuyente válido.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          {/* Correo electrónico */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustomUsername">
-              <Form.Label>Correo electrónico</Form.Label>
-              <InputGroup hasValidation>
-                <Form.Control
-                  type="text"
-                  placeholder="Ej: juanperez@gmail.com"
-                  aria-describedby="inputGroupPrepend"
-                  required
-                  onChange={handleChange}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Por favor, proporciona un correo válido.
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom11">
-              <Form.Label>Departamento</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: Cundinamarca"
-                required
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback type="invalid">
-                Por favor, proporciona un departamento válido.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          {/* Ciudad y código postal */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustom03">
-              <Form.Label>Ciudad</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: Bogotá"
-                required
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback type="invalid">
-                Por favor, proporciona una ciudad válida.
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom09">
-              <Form.Label>Código postal</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: 110221"
-                required
-                onChange={handleChange}
-              />
-              <Form.Control.Feedback type="invalid">
-                Por favor, proporciona un código postal válido.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          {/* Contraseña y confirmar contraseña */}
-          <Row
-            className="mb-3"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
-            <Form.Group as={Col} md="5" controlId="validationCustom10">
-              <Form.Label>Contraseña</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Ej: **********"
-                  onChange={handleChange}
-                  isInvalid={
-                    validated && form.password !== form.confirmPassword
-                  }
-                  required
-                />
-                <InputGroup.Text>
-                  <img
-                    src={eyeIcon}
-                    alt="eyeIcon"
-                    onClick={() => togglePasswordVisibility("password")}
-                    style={{
-                      cursor: "pointer",
-                      width: "20px",
-                    }}
-                  />
-                </InputGroup.Text>
-              </InputGroup>
-              <Form.Control.Feedback type="invalid">
-                Las contraseñas no coinciden.
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="5" controlId="validationCustom08">
-              <Form.Label>Confirmar contraseña</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Ej: **********"
-                  onChange={handleChange}
-                  isInvalid={
-                    validated && form.password !== form.confirmPassword
-                  }
-                  required
-                />
-                <InputGroup.Text>
-                  <img
-                    src={eyeIcon}
-                    alt="eyeIcon"
-                    onClick={() => togglePasswordVisibility("confirmPassword")}
-                    style={{
-                      cursor: "pointer",
-                      width: "20px",
-                    }}
-                  />
-                </InputGroup.Text>
-              </InputGroup>
-              <span style={{ color: "red " }}>
-                {form.password !== form.confirmPassword &&
-                  "Las contraseñas no coinciden"}
-              </span>
-              <Form.Control.Feedback type="invalid">
-                Las contraseñas no coinciden.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-          <Form.Group className="mb-3">
-            <Form.Check
-              required
-              label={
-                <a
-                  onClick={abrirTerminosYCondiciones}
-                  className={styles.a_terminos_condiciones}
-                >
-                  Aceptar términos y condiciones
-                </a>
-              }
-              feedback="Debes aceptar los términos y condiciones antes de enviar."
-              feedbackType="invalid"
-            />
-            <Form.Check label="Recibir notificaciones de ofertas y promociones" />
-          </Form.Group>
+        <form className={styles.f_general_style}>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "Ej. Juan",
+              form.nombre,
+              "text",
+              "nombre",
+              validateForm.nombre
+            )}
+            {abrir_input_span_verificator(
+              "Ej. Perez",
+              form.apellido,
+              "text",
+              "apellido",
+              validateForm.apellido
+            )}
+          </div>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "tipodocumento",
+              form.tipoDocumento,
+              "text",
+              "Tipo Documento",
+              validateForm.defaultTipoDocumento,
+              true,
+              form.opcionesTipoDocumento,
+              form.defaultTipoDocumento
+            )}
+            {abrir_input_span_verificator(
+              "Ej. 1234567890",
+              form.numeroDocumento,
+              "number",
+              "numeroDocumento",
+              validateForm.numeroDocumento
+            )}
+          </div>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "Ej. 3121234567",
+              form.numeroTelefono,
+              "number",
+              "numeroTelefono",
+              validateForm.numeroTelefono
+            )}
+            {abrir_input_span_verificator(
+              "tipocontribuyente",
+              form.tipoContribuyente,
+              "text",
+              "Tipo Contribuyente",
+              validateForm.defaultTipoContribuyente,
+              true,
+              form.opcionesTipoContribuyente,
+              form.defaultTipoContribuyente
+            )}
+          </div>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "Ej. juanperez@gmail.com",
+              form.correoElectronico,
+              "text",
+              "correoElectronico",
+              validateForm.correoElectronico
+            )}
+            {abrir_input_span_verificator(
+              "Ej. Cundinamarca",
+              form.departamento,
+              "text",
+              "departamento",
+              validateForm.departamento
+            )}
+          </div>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "Ej. Bogotá",
+              form.ciudad,
+              "text",
+              "ciudad",
+              validateForm.ciudad
+            )}
+            {abrir_input_span_verificator(
+              "Ej. 11001",
+              form.codigoPostal,
+              "number",
+              "codigoPostal",
+              validateForm.codigoPostal
+            )}
+          </div>
+          <div className={styles.d_row_function_general_style}>
+            {abrir_input_span_verificator(
+              "**********",
+              form.password,
+              "password",
+              "password",
+              validateForm.password
+            )}
+            {abrir_input_span_verificator(
+              "**********",
+              form.confirmPassword,
+              "password",
+              "confirmPassword",
+              validateForm.confirmPassword
+            )}
+          </div>
           <button
             onClick={handleSubmit}
             type="submit"
@@ -332,13 +323,11 @@ const ModalRegister: React.FC = () => {
               border: "none",
               cursor: "pointer",
             }}
-            disabled={
-              form.password !== form.confirmPassword && form.password !== ""
-            }
+            disabled={disableButton(validateForm)}
           >
-            Registrarme
+            {disableButton(validateForm) ? "Registrandome..." : "Registrarme"}
           </button>
-        </Form>
+        </form>
       </div>
     </>
   );
@@ -364,14 +353,10 @@ const TipoDocumento = [
 const TipoContribuyente = [
   {
     id: 1,
-    name: "No aplica",
-  },
-  {
-    id: 2,
     name: "Régimen Común",
   },
   {
-    id: 3,
+    id: 2,
     name: "Régimen Simplificado",
   },
 ];
