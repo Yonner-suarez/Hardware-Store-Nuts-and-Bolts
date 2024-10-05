@@ -16,6 +16,7 @@ import Loader from "../Loader/Loader";
 import verifyIconError from "../../../assets/clarity--error-line.svg";
 import Select, { Input } from "react-select";
 import { useEffect } from "react";
+import logo from "../../../assets/pepicons-pencil--hammer-claw-circle-filled.svg";
 
 const ModalRegister: React.FC = () => {
   const [validated, setValidated] = useState(false);
@@ -37,6 +38,8 @@ const ModalRegister: React.FC = () => {
     codigoPostal: "",
     password: "",
     confirmPassword: "",
+    checkedTerminosYCondiciones: false,
+    checkedNotificaciones: false,
   });
   const [validateForm, setValidateForm] = useState({
     nombre: "",
@@ -53,6 +56,8 @@ const ModalRegister: React.FC = () => {
     codigoPostal: "",
     password: "",
     confirmPassword: "",
+    checkedTerminosYCondiciones: "",
+    checkedNotificaciones: false,
   });
 
   useEffect(() => {
@@ -69,7 +74,10 @@ const ModalRegister: React.FC = () => {
     });
   }, []);
 
-  // Función para manejar cambios en los inputs y selects
+  const handleShowPassword = (type: string) => {
+    if (type === "password") setShowPassword(!showPassword);
+    else setShowConfirmPassword(!showConfirmPassword);
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -81,6 +89,17 @@ const ModalRegister: React.FC = () => {
       });
       ValidateFormFunc(
         { ...form, [name]: { value: e.value, label: e.label } },
+        validateForm,
+        setValidateForm
+      );
+    } else if (e.target.type === "checkbox") {
+      const { name, checked } = e.target;
+      setForm((prevForm) => ({
+        ...prevForm,
+        [name]: checked === true,
+      }));
+      ValidateFormFunc(
+        { ...form, [name]: checked === true },
         validateForm,
         setValidateForm
       );
@@ -97,17 +116,32 @@ const ModalRegister: React.FC = () => {
       );
     }
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // Código existente para el caso de éxito
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     setShowLoading({ display: "block" });
+    e.preventDefault();
+    if (validateForm.checkedTerminosYCondiciones !== "") {
+      console.log(validateForm.checkedTerminosYCondiciones);
+      return errorTerminosYCondiciones(
+        validateForm.checkedTerminosYCondiciones
+      );
+    }
     setTimeout(() => {
-      setShowLoading({ display: "none" });
       Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
+      setShowLoading({ display: "none" });
     }, 2000);
   };
 
   const abrirTerminosYCondiciones = () => {
     Swal.fire("Acá abre el pdf de terminos y condiciones!", "", "info");
+  };
+
+  const errorTerminosYCondiciones = (message: string) => {
+    Swal.fire(
+      message || "Debe aceptar los terminos y condiciones",
+      "",
+      "error"
+    );
+    setShowLoading({ display: "none" });
   };
 
   const abrir_input_span_verificator = (
@@ -116,21 +150,46 @@ const ModalRegister: React.FC = () => {
     type: string,
     name: string,
     texto: string,
-    select: bool = false,
+    select: boolean = false,
     optionsSelect: Array,
-    defaultState: any
+    defaultState: any,
+    iconPass: boolean = false,
+    typePass: string = "password"
   ) => {
     if (!select)
       return (
         <div className={styles.d_rows}>
-          <input
-            className={styles.i_general_Style}
-            type={type}
-            name={name}
-            value={propValidar}
-            onChange={handleChange}
-            placeholder={Placeholder}
-          />
+          {!iconPass ? (
+            <input
+              className={styles.i_general_Style}
+              type={type}
+              name={name}
+              value={propValidar}
+              onChange={handleChange}
+              placeholder={Placeholder}
+            />
+          ) : (
+            <div className={styles.div_input_password_style}>
+              <input
+                className={styles.i_general_Style}
+                type={type}
+                name={name}
+                value={propValidar}
+                onChange={handleChange}
+                placeholder={Placeholder}
+                style={{
+                  width: "70%",
+                }}
+              />
+              <img
+                className={styles.i_eye_pass}
+                src={eyeIcon}
+                alt="eye"
+                onClick={() => handleShowPassword(typePass)}
+              />
+            </div>
+          )}
+
           <span className={styles.sp_general_style}>
             {texto !== "" && validateForm[name] !== "" ? (
               <>
@@ -209,8 +268,21 @@ const ModalRegister: React.FC = () => {
     <>
       <Loader estilo={showLoading} />
       <div className={styles.div_completar_datos}>
-        Completa tus datos para registrarte en la plataforma
         <form className={styles.f_general_style}>
+          <h6 className={styles.h6_completar_datos}>
+            Completa tus datos para registrarte en la plataforma
+            <br />
+            <br />
+            <img
+              src={logo}
+              alt="logo"
+              style={{
+                width: "50px",
+                backgroundColor: "#000000",
+                borderRadius: "50%",
+              }}
+            />
+          </h6>
           <div className={styles.d_row_function_general_style}>
             {abrir_input_span_verificator(
               "Ej. Juan",
@@ -301,17 +373,63 @@ const ModalRegister: React.FC = () => {
             {abrir_input_span_verificator(
               "**********",
               form.password,
+              showPassword ? "text" : "password",
               "password",
-              "password",
-              validateForm.password
+              validateForm.password,
+              false,
+              null,
+              null,
+              true
             )}
             {abrir_input_span_verificator(
               "**********",
               form.confirmPassword,
-              "password",
+              showConfirmPassword ? "text" : "password",
               "confirmPassword",
-              validateForm.confirmPassword
+              validateForm.confirmPassword,
+              false,
+              null,
+              null,
+              true,
+              "confirmPassword"
             )}
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value={form.checkedTerminosYCondiciones}
+              id="flexCheckIndeterminate"
+              name="checkedTerminosYCondiciones"
+              onChange={handleChange}
+            />
+            <label className="form-check-label" for="flexCheckIndeterminate">
+              <a
+                onClick={abrirTerminosYCondiciones}
+                href={abrirTerminosYCondiciones}
+                className={styles.a_terminos_condiciones}
+              >
+                Terminos y condiciones
+              </a>
+            </label>
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value={form.checkedNotificaciones}
+              id="flexCheckIndeterminate"
+              name="checkedNotificaciones"
+              onChange={handleChange}
+            />
+            <label
+              className="form-check-label"
+              for="flexCheckIndeterminate"
+              style={{ color: "#000" }}
+            >
+              Deseas recibir notificaciones <br />
+              de nuevos productos y promociones
+            </label>
           </div>
           <button
             onClick={handleSubmit}
@@ -322,6 +440,7 @@ const ModalRegister: React.FC = () => {
               color: "#fff",
               border: "none",
               cursor: "pointer",
+              marginTop: "20px",
             }}
             disabled={disableButton(validateForm)}
           >

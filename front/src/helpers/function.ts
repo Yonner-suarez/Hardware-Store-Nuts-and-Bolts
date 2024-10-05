@@ -119,6 +119,12 @@ export const ValidateFormFunc = (
     validateForm.confirmPassword = "Las contraseñas no coinciden";
   else validateForm.confirmPassword = "";
 
+  //terminos y condiciones
+  if (!form.checkedTerminosYCondiciones)
+    validateForm.checkedTerminosYCondiciones =
+      "Debe aceptar los terminos y condiciones";
+  else validateForm.checkedTerminosYCondiciones = "";
+
   setValidateForm(validateForm);
 };
 export const disableButton = (form: any) => {
