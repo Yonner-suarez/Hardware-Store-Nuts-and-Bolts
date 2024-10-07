@@ -18,10 +18,10 @@ if (file_exists($envFile)) {
     }
 }
 
-$host = $envVariables['HOST'] ?? '';
-$dbName = $envVariables['DB_NAME'] ?? '';
-$dbUser = $envVariables['DB_USER'] ?? '';
-$dbPassword = $envVariables['DB_PASSWORD'] ?? '';
-$dbPort = $envVariables['DB_PORT'] ?? '';
-$jwtKey = $envVariables['JWT_KEY'] ?? '';
-$jwtExp = $envVariables['JWT_EXP'] ?? '';
+$host = $envVariables['HOST'] ?? 'localhost'; 
+$dbName = $envVariables['DB_NAME'] ?? 'hardware_store';
+$dbUser = $envVariables['DB_USER'] ?? 'root'; 
+$dbPassword = $envVariables['DB_PASSWORD'] ?? '12345678'; 
+$dbPort = $envVariables['DB_PORT'] ?? '3306'; 
+$jwtKey = $envVariables['JWT_KEY'] ?? 'your_jwt_secret';
+$jwtExp = $envVariables['JWT_EXP'] ?? 3600;
