@@ -3,9 +3,13 @@ import { Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/NavBar/Navbar";
 import Footer from "./components/Footer/Footer";
-import Cotizaciones from "./pages/Cotizaciones";
+import Cotizaciones from "./pages/cotizaciones/Cotizaciones";
 import Loader from "./components/Loader/Loader";
 import { getTokenFromLocalStorage } from "./helpers/function";
+import Home from "./pages/Home/Home";
+import ModalRegister from "./components/ModalRegister/ModalRegister";
+import Tools from "./pages/Tools/Tools";
+
 function App() {
   const [showLoading, setShowLoading] = useState({ display: "none" });
 
@@ -27,13 +31,29 @@ function App() {
       ></Loader>
       <Navbar />
       <Routes>
-        <Route>
-          <Route
-            path="/HardawareStore/cotizaciones/generar"
-            element={<Cotizaciones />}
-          />
-        </Route>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/HardawareStore/cotizaciones/generar"
+          element={<Cotizaciones />}
+        />
+        <Route
+          path="/HardwareStore/register/user"
+          element={<ModalRegister />}
+        />
+        <Route
+          path="/HardwareStore/products/construccion"
+          element={<Tools />}
+        />
+        <Route
+          path="/HardwareStore/products/latoneriaypintura"
+          element={<Tools />}
+        />
+        <Route
+          path="/HardwareStore/products/ornamentacion"
+          element={<Tools />}
+        />
       </Routes>
+
       <Footer />
     </>
   );

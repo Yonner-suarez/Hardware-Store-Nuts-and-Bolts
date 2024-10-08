@@ -6,11 +6,12 @@ import shoppingBag from "../../../assets/ic--baseline-shopping-bag.svg";
 import styles from "./NavBar.module.css";
 import { obtenerNombreCiudad } from "../../helpers/function";
 import Swal from "sweetalert2";
-//import profileImage from "../../../assets/profile_example.jpeg";
+import IconCotizador from "../../../assets/pajamas--review-list_nabvar.svg";
+import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
   const profileImage = "";
-  const [isLogged, setIsLogged] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
   const [NameAccount, setNameAccount] = useState("Julieth");
   const [searchTerm, setSearchTerm] = useState("");
   const [coordenadas, setCoordenadas] = useState({});
@@ -64,10 +65,16 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={styles.navbar}>
-      <a className={styles.a_navbar_logo_style} href="#">
-        <img src={Logo} alt="Logo" className="img-all-navbar-style" />
+      <a className={styles.a_navbar_logo_style} href="/">
+        <img
+          src={Logo}
+          alt="Logo"
+          className="img-all-navbar-style"
+          title="Logo"
+        />
         <span className={styles.span_navbar_style}>
-          Hardware Store Nuts and Bolts
+          Hardware Store <br />
+          Nuts and Bolts
         </span>
       </a>
 
@@ -88,6 +95,7 @@ const Navbar: React.FC = () => {
             <img
               src={ubicacion}
               alt="Ubicacion"
+              title="Ubicación"
               className="img-all-navbar-style"
             />
             <div className={styles.div_li_ul_navbar_location_style}>
@@ -104,10 +112,20 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </li>
-        <li className={styles.nav_item_bag_style}>
+        <li className={styles.nav_item_style}>
+          <Link to="/HardawareStore/cotizaciones/generar">
+            <img
+              src={IconCotizador}
+              alt="Cotizador"
+              className="img-all-navbar-style"
+              title="Cotizador"
+              style={{ width: "45px", cursor: "pointer" }}
+            />
+          </Link>
           <img
             src={shoppingBag}
             alt="Shopping Bag"
+            title="Carrito de compras"
             className="img-all-navbar-style"
             onClick={() => {}}
           />
@@ -119,6 +137,7 @@ const Navbar: React.FC = () => {
                 <img
                   src={profileImage}
                   alt="profile"
+                  title="Mi cuenta"
                   className="img_nabvar_profile_style"
                   onClick={() => {}}
                 />
@@ -131,11 +150,12 @@ const Navbar: React.FC = () => {
               <img
                 src={account}
                 alt="Account"
+                title="Mi cuenta"
                 className="img-all-navbar-style"
                 onClick={() => {}}
               />
             )}
-            <span className={styles.span_navbar_style}>
+            <span className={styles.span_navbar_style} title="Mi cuenta">
               {isLogged ? "Mi Cuenta" : "Hola " + NameAccount}
             </span>
           </div>

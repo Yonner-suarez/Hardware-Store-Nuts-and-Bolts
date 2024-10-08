@@ -54,3 +54,7 @@ body {
 .img_nabvar_profile_style:hover {
   cursor: pointer;
 }
+.style-img-all-carrusel {
+  width: 100%;
+  height: 100%;
+}
