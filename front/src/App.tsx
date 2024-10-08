@@ -8,6 +8,7 @@ import Loader from "./components/Loader/Loader";
 import { getTokenFromLocalStorage } from "./helpers/function";
 import Home from "./pages/Home/Home";
 import ModalRegister from "./components/ModalRegister/ModalRegister";
+import Tools from "./pages/Tools/Tools";
 
 function App() {
   const [showLoading, setShowLoading] = useState({ display: "none" });
@@ -39,7 +40,20 @@ function App() {
           path="/HardwareStore/register/user"
           element={<ModalRegister />}
         />
+        <Route
+          path="/HardwareStore/products/construccion"
+          element={<Tools />}
+        />
+        <Route
+          path="/HardwareStore/products/latoneriaypintura"
+          element={<Tools />}
+        />
+        <Route
+          path="/HardwareStore/products/ornamentacion"
+          element={<Tools />}
+        />
       </Routes>
+
       <Footer />
     </>
   );
