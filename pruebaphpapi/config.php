@@ -23,5 +23,5 @@ $dbName = $envVariables['DB_NAME'] ?? '';
 $dbUser = $envVariables['DB_USER'] ?? '';
 $dbPassword = $envVariables['DB_PASSWORD'] ?? '';
 $dbPort = $envVariables['DB_PORT'] ?? '';
-
-
+$jwtKey = $envVariables['JWT_KEY'] ?? '';
+$jwtExp = $envVariables['JWT_EXP'] ?? '';

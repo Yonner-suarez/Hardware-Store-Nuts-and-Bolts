@@ -13,7 +13,7 @@ class GeneralResponse implements JsonSerializable
     $this->data = $data;
   }
 
-   public function jsonSerialize() {
+   public function jsonSerialize(): array {
         return [
             'message' => $this->message,
             'status' => $this->status,
