@@ -1,12 +1,5 @@
 //@ts-nocheck
-import {
-  Form,
-  Col,
-  Row,
-  Button,
-  InputGroup,
-  Placeholder,
-} from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { ValidateFormFunc, disableButton } from "../../helpers/function";
 import { useState } from "react";
 import Swal from "sweetalert2";
