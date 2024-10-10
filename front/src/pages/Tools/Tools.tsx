@@ -3,8 +3,11 @@ import numeral from "numeral";
 import { useEffect, useState } from "react";
 import StarIcon from "../../../assets/iconamoon--star.svg";
 import StarIconHalf from "../../../assets/iconamoon--star-fill.svg";
-const Tools: React.FC = () => {
+import { useBag } from "../../helpers/BagContext";
+import Swal from "sweetalert2";
+const Tools: React.FC = ({ filtro }: { filtro: boolean }) => {
   const [tools, setTools] = useState([]);
+  const { bag, setBag } = useBag();
 
   useEffect(() => {
     setTools(ToolsResponse.data);
@@ -13,7 +16,6 @@ const Tools: React.FC = () => {
   const showStars = (puntuacion: number) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      console.log(i, puntuacion);
       if (i < puntuacion) {
         // Estrella llena
         stars.push(<img src={StarIconHalf} alt="Full Star" />);
@@ -25,9 +27,35 @@ const Tools: React.FC = () => {
     return stars;
   };
 
+  const agregarAlCarrito = (tool: any) => {
+    const findtool = bag.some((item: any) => item.id === tool.id);
+
+    if (findtool) {
+      return Swal.fire({
+        title:
+          "Este producto ya se encuentra en el carrito, ¿Quieres ir al carrito?",
+        icon: "question",
+        iconHtml: "؟",
+        confirmButtonText: "Si",
+        cancelButtonText: "No",
+        showCancelButton: true,
+        showCloseButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/HardwareStore/user/bag";
+        }
+      });
+    }
+    let toolaux = {
+      ...tool,
+      cantidad: 1,
+    };
+    setBag([...bag, toolaux]);
+  };
+
   return (
     <>
-      <Header />
+      {filtro ? <Header /> : <div></div>}
       <div
         className="card"
         style={{
@@ -78,7 +106,10 @@ const Tools: React.FC = () => {
                 {tool.name}
                 <br />$ {numeral(tool.price).format("0,0.00")} und
               </p>
-              <div>{showStars(tool.puntuacion)}</div>
+              <div>
+                {showStars(tool.puntuacion)}{" "}
+                <label>({tool.puntuacion} / 5)</label>
+              </div>
               <button
                 type="button"
                 className="btn btn-primary"
@@ -86,6 +117,9 @@ const Tools: React.FC = () => {
                   backgroundColor: "#004876",
                   color: "#fff",
                   border: "none",
+                }}
+                onClick={() => {
+                  agregarAlCarrito(tool);
                 }}
               >
                 Agregar al carrito
@@ -109,6 +143,7 @@ const ToolsResponse: any = {
       price: 45000,
       marca: "Argos",
       puntuacion: 3,
+      code: "1234567890",
     },
     {
       id: 2,
@@ -116,6 +151,7 @@ const ToolsResponse: any = {
       price: 35000,
       marca: "Yura",
       puntuacion: 4,
+      code: "54645646646554654",
     },
     {
       id: 3,
@@ -123,6 +159,7 @@ const ToolsResponse: any = {
       price: 35000,
       marca: "Andino",
       puntuacion: 5,
+      code: "54645646646554654",
     },
     {
       id: 4,
@@ -130,6 +167,7 @@ const ToolsResponse: any = {
       price: 35000,
       marca: "Holcim",
       puntuacion: 4,
+      code: "54645646646554654",
     },
     {
       id: 5,
@@ -137,6 +175,7 @@ const ToolsResponse: any = {
       price: 125000,
       marca: "Kolor",
       puntuacion: 4,
+      code: "54645646646554654",
     },
     {
       id: 6,
@@ -144,6 +183,7 @@ const ToolsResponse: any = {
       price: 125000,
       marca: "Pintuco",
       puntuacion: 2,
+      code: "54645646646554654",
     },
     {
       id: 7,
@@ -151,6 +191,7 @@ const ToolsResponse: any = {
       price: 125000,
       marca: "Black&Decker",
       puntuacion: 4,
+      code: "54645646646554654",
     },
     {
       id: 8,
@@ -158,6 +199,7 @@ const ToolsResponse: any = {
       price: 150000,
       marca: "Black&Decker",
       puntuacion: 0,
+      code: "54645646646554654",
     },
     {
       id: 9,
@@ -165,6 +207,7 @@ const ToolsResponse: any = {
       price: 150000,
       marca: "Black&Decker",
       puntuacion: 4,
+      code: "54645646646554654",
     },
   ],
 };
