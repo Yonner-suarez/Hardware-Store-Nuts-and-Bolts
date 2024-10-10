@@ -153,16 +153,8 @@ const ModalRegister: React.FC = () => {
       return (
         <div className={styles.d_rows}>
           {!iconPass ? (
-            <input
-              className={styles.i_general_Style}
-              type={type}
-              name={name}
-              value={propValidar}
-              onChange={handleChange}
-              placeholder={Placeholder}
-            />
-          ) : (
-            <div className={styles.div_input_password_style}>
+            <>
+              <span style={{ color: "black", fontWeight: "bold" }}>{name}</span>
               <input
                 className={styles.i_general_Style}
                 type={type}
@@ -170,17 +162,31 @@ const ModalRegister: React.FC = () => {
                 value={propValidar}
                 onChange={handleChange}
                 placeholder={Placeholder}
-                style={{
-                  width: "70%",
-                }}
               />
-              <img
-                className={styles.i_eye_pass}
-                src={eyeIcon}
-                alt="eye"
-                onClick={() => handleShowPassword(typePass)}
-              />
-            </div>
+            </>
+          ) : (
+            <>
+              <span style={{ color: "black", fontWeight: "bold" }}>{name}</span>
+              <div className={styles.div_input_password_style}>
+                <input
+                  className={styles.i_general_Style}
+                  type={type}
+                  name={name}
+                  value={propValidar}
+                  onChange={handleChange}
+                  placeholder={Placeholder}
+                  style={{
+                    width: "70%",
+                  }}
+                />
+                <img
+                  className={styles.i_eye_pass}
+                  src={eyeIcon}
+                  alt="eye"
+                  onClick={() => handleShowPassword(typePass)}
+                />
+              </div>
+            </>
           )}
 
           <span className={styles.sp_general_style}>
@@ -203,7 +209,7 @@ const ModalRegister: React.FC = () => {
       return (
         <>
           <div className={styles.d_rows}>
-            <label>{name}</label>
+            <label style={{ color: "black", fontWeight: "bold" }}>{name}</label>
             <Select
               id={name}
               name={name}

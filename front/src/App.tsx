@@ -9,7 +9,8 @@ import { getTokenFromLocalStorage } from "./helpers/function";
 import Home from "./pages/Home/Home";
 import ModalRegister from "./components/ModalRegister/ModalRegister";
 import Tools from "./pages/Tools/Tools";
-
+import Bag from "./pages/Bag/Bag";
+import Profile from "./pages/Profile/Profile";
 function App() {
   const [showLoading, setShowLoading] = useState({ display: "none" });
 
@@ -41,17 +42,11 @@ function App() {
           element={<ModalRegister />}
         />
         <Route
-          path="/HardwareStore/products/construccion"
-          element={<Tools />}
+          path="/HardwareStore/products"
+          element={<Tools filtro={true} />}
         />
-        <Route
-          path="/HardwareStore/products/latoneriaypintura"
-          element={<Tools />}
-        />
-        <Route
-          path="/HardwareStore/products/ornamentacion"
-          element={<Tools />}
-        />
+        <Route path="/HardwareStore/user/profile" element={<Profile />} />
+        <Route path="/HardwareStore/user/bag" element={<Bag />} />
       </Routes>
 
       <Footer />

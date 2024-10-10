@@ -25,7 +25,7 @@ const TipoProductos: React.FC = () => {
         }}
       >
         <Link
-          to="/HardwareStore/products/construccion"
+          to="/HardwareStore/products"
           style={{ textDecoration: "none", width: "100%" }}
         >
           <img
@@ -50,7 +50,7 @@ const TipoProductos: React.FC = () => {
         }}
       >
         <Link
-          to="/HardwareStore/products/latoneriaypintura"
+          to="/HardwareStore/products"
           style={{ textDecoration: "none", width: "100%" }}
         >
           <img
@@ -74,7 +74,7 @@ const TipoProductos: React.FC = () => {
         }}
       >
         <Link
-          to="/HardwareStore/products/ornamentacion"
+          to="/HardwareStore/products"
           style={{ textDecoration: "none", width: "100%" }}
         >
           <img

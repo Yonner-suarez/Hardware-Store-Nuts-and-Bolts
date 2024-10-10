@@ -8,6 +8,7 @@ import { obtenerNombreCiudad } from "../../helpers/function";
 import Swal from "sweetalert2";
 import IconCotizador from "../../../assets/pajamas--review-list_nabvar.svg";
 import { Link } from "react-router-dom";
+import { useBag } from "../../helpers/BagContext";
 
 const Navbar: React.FC = () => {
   const profileImage = "";
@@ -30,6 +31,8 @@ const Navbar: React.FC = () => {
       }
     }
   };
+
+  const { bag } = useBag();
 
   const handleSearch = () => {
     // TODO: Implementar la búsqueda de productos
@@ -122,42 +125,59 @@ const Navbar: React.FC = () => {
               style={{ width: "45px", cursor: "pointer" }}
             />
           </Link>
-          <img
-            src={shoppingBag}
-            alt="Shopping Bag"
-            title="Carrito de compras"
-            className="img-all-navbar-style"
-            onClick={() => {}}
-          />
+          <Link to="/HardwareStore/user/bag">
+            <img
+              src={shoppingBag}
+              alt="Shopping Bag"
+              title="Carrito de compras"
+              className="img-all-navbar-style"
+              onClick={() => {}}
+            />
+            <span
+              style={{
+                color: "white",
+                textAlign: "center",
+                textDecoration: "none",
+              }}
+            >
+              {bag?.length > 0 ? bag?.length : ""}
+            </span>
+          </Link>
         </li>
         <li className={styles.nav_item_style}>
           <div className={styles.div_li_ul_navbar_style}>
             {isPerfil ? (
               profileImage !== "" ? (
-                <img
-                  src={profileImage}
-                  alt="profile"
-                  title="Mi cuenta"
-                  className="img_nabvar_profile_style"
-                  onClick={() => {}}
-                />
+                <Link to="/HardwareStore/user/profile">
+                  <img
+                    src={profileImage}
+                    alt="profile"
+                    title="Mi cuenta"
+                    className="img_nabvar_profile_style"
+                  />
+                </Link>
               ) : (
-                <span className={styles.span_nabvar_profile_style}>
-                  {isPerfil}
-                </span>
+                <Link to="/HardwareStore/user/profile">
+                  <span className={styles.span_nabvar_profile_style}>
+                    {isPerfil}
+                  </span>
+                </Link>
               )
             ) : (
-              <img
-                src={account}
-                alt="Account"
-                title="Mi cuenta"
-                className="img-all-navbar-style"
-                onClick={() => {}}
-              />
+              <Link to="/HardwareStore/user/profile">
+                <img
+                  src={account}
+                  alt="Account"
+                  title="Mi cuenta"
+                  className="img-all-navbar-style"
+                />
+              </Link>
             )}
-            <span className={styles.span_navbar_style} title="Mi cuenta">
-              {isLogged ? "Mi Cuenta" : "Hola " + NameAccount}
-            </span>
+            <Link to="/HardwareStore/user/profile">
+              <span className={styles.span_navbar_style} title="Mi cuenta">
+                {isLogged ? "Mi Cuenta" : "Hola " + NameAccount}
+              </span>
+            </Link>
           </div>
         </li>
       </ul>
