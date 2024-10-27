@@ -1,9 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+interface IBag {
+  id: number;
+  name: string;
+  price: string;
+  marca: string;
+  puntuacion: number;
+  code: string;
+  id_quote: number;
+  cantidad: number;
+}
 // Crear un contexto
-const BagContext = createContext({
+const BagContext = createContext<BagContextProps>({
   bag: [],
-  setBag: (bag: any[]) => {},
+  setBag: (bag: IBag[]) => {},
 });
 
 // Hook para usar el contexto
@@ -13,7 +23,7 @@ export const useBag = () => {
 
 // Proveedor del contexto
 export const BagProvider = ({ children }: any) => {
-  const [bag, setBag] = useState<any[]>(() => {
+  const [bag, setBag] = useState<IBag[]>(() => {
     // Inicializar el carrito desde Local Storage
     return JSON.parse(localStorage.getItem("bag") || "[]");
   });

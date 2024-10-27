@@ -3,7 +3,7 @@
         'name' => 'api/hardware',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'a700ed1ae80f7b0e352d5bd7a59910c45729f005',
+        'reference' => 'e584f3316e9d441edb2f534388aba6ebcbbcf232',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'api/hardware' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'a700ed1ae80f7b0e352d5bd7a59910c45729f005',
+            'reference' => 'e584f3316e9d441edb2f534388aba6ebcbbcf232',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -70,6 +70,5 @@ class Middleware {
   }
 }
 
-class UnauthorizedResponse extends \Exception {
-}
+
 ?>

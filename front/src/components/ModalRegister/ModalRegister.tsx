@@ -10,6 +10,7 @@ import verifyIconError from "../../../assets/clarity--error-line.svg";
 import Select, { Input } from "react-select";
 import { useEffect } from "react";
 import logo from "../../../assets/pepicons-pencil--hammer-claw-circle-filled.svg";
+import axios from "axios";
 
 const ModalRegister: React.FC = () => {
   const [validated, setValidated] = useState(false);
@@ -109,19 +110,52 @@ const ModalRegister: React.FC = () => {
       );
     }
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setShowLoading({ display: "block" });
     e.preventDefault();
     if (validateForm.checkedTerminosYCondiciones !== "") {
-      console.log(validateForm.checkedTerminosYCondiciones);
       return errorTerminosYCondiciones(
         validateForm.checkedTerminosYCondiciones
       );
     }
-    setTimeout(() => {
-      Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
+
+    const url =
+      "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/auth/register";
+
+    try {
+      // Llamada a la API
+      const params = {
+        username: form.nombre + form.apellido,
+        email: form.correoElectronico,
+        password: form.password,
+        nombre: form.nombre,
+        apellido: form.apellido,
+        numeroDocumento: form.numeroDocumento,
+        numeroTelefono: form.numeroTelefono,
+        departamento: form.departamento,
+        ciudad: form.ciudad,
+        codigoPostal: form.codigoPostal,
+        tipoContribuyente: form.defaultTipoContribuyente.value,
+        tipoDocumento: form.defaultTipoDocumento.value,
+      };
+
+      // Llamada a la API
+      const response = await axios.post(url, params, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data.code === 200) {
+        Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
+      } else {
+        Swal.fire("Error", response.data.error, "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", "No se pudo conectar con el servidor", "error");
+    } finally {
       setShowLoading({ display: "none" });
-    }, 2000);
+    }
   };
 
   const abrirTerminosYCondiciones = () => {
@@ -267,7 +301,7 @@ const ModalRegister: React.FC = () => {
     <>
       <Loader estilo={showLoading} />
       <div className={styles.div_completar_datos}>
-        <form className={styles.f_general_style}>
+        <form className={styles.f_general_style} onSubmit={handleSubmit}>
           <h6 className={styles.h6_completar_datos}>
             Completa tus datos para registrarte en la plataforma
             <br />
@@ -431,7 +465,6 @@ const ModalRegister: React.FC = () => {
             </label>
           </div>
           <button
-            onClick={handleSubmit}
             type="submit"
             className="btn btn-primary"
             style={{

@@ -7,12 +7,15 @@ import ToolExample from "../../../assets/tools/Combo Taladro Percutor 12 pulg 55
 import ChatIcon from "../../../assets/chat.svg";
 import shoppingBagIcon from "../../../assets/Shopping bag.svg";
 import IconCotizador from "../../../assets/pajamas--review-list.svg";
+import { jwtDecode } from "jwt-decode";
 
 const Profile: React.FC = () => {
   const profileImage = "";
   const [isPerfil, setIsPerfil] = useState("");
-
-  const correoPrueba = "Julieth Fuentes";
+  const [dataToken, setDataToken] = useState({
+    email: "",
+    role: "",
+  });
 
   const obtenerIniciales = (correo: string): void => {
     if (correo === "") {
@@ -33,8 +36,25 @@ const Profile: React.FC = () => {
     });
   };
   useEffect(() => {
-    obtenerIniciales(correoPrueba);
+    getTokenData();
+    obtenerIniciales(dataToken?.email?.split("@")[0] || "");
   }, []);
+
+  const getTokenData = () => {
+    const token = localStorage.getItem("token"); // Suponiendo que tu token está guardado en localStorage
+    if (!token) {
+      return null; // No hay token disponible
+    }
+
+    try {
+      // Decodifica el token
+      const decoded = jwtDecode(token);
+      setDataToken({ ...dataToken, email: decoded.iss, role: decoded.role });
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+      return null;
+    }
+  };
   return (
     <div className={styles.profileContainer}>
       {/* Información personal */}
@@ -63,7 +83,7 @@ const Profile: React.FC = () => {
           )}
           <div style={{ textAlign: "left" }}>
             <h2>Julieth</h2>
-            <p>julieths@gmail.com</p>
+            <p>{dataToken.email}</p>
           </div>
         </div>
 

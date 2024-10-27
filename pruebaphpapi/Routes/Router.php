@@ -22,7 +22,7 @@ class Router{
 
     return $this->redirectRouter();
     }
-    catch (InternalServerErrorResponse $e)
+    catch (Exception $e)
     { 
       throw $e;
     }
@@ -37,7 +37,7 @@ class Router{
 
       return $router->action($this->method, ucfirst($this->router), $this->idParam);
     }
-    catch (InternalServerErrorResponse $e)
+    catch (Exception $e)
     {  
       throw $e;
     }

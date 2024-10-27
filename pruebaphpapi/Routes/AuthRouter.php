@@ -15,7 +15,7 @@ class AuthRouter
       $controller = new AuthController();
       return OKResponse::response_ok((new AuthController())->$method($request));
     }
-    catch (InternalServerErrorResponse $e)
+    catch (Exception $e)
     {
       throw $e;
     }

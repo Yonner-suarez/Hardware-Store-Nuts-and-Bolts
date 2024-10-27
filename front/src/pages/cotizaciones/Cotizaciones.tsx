@@ -9,41 +9,86 @@ import IconCotizador from "../../../assets/pajamas--review-list.svg";
 import Loader from "../../components/Loader/Loader";
 import IconTrash from "../../../assets/f7--trash-circle-fill.svg";
 import numeral from "numeral";
-
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { useBag } from "../../helpers/BagContext";
 const Cotizaciones: React.FC = () => {
+  const navigate = useNavigate();
+
+  const { bag, setBag } = useBag();
+
   const [totalCotizacion, setTotalCotizacion] = useState(0);
   const [showLoading, setShowLoading] = useState({ display: "none" });
   const [cotizaciones, setCotizaciones] = useState<ICotizaciones>({
     herramientas: [],
     opcionesHerramientas: [{ value: -1, label: "Seleccione una opción" }],
+    idUser: 0,
   });
   const [cantidadProducto, setCantidadProducto] = useState(0);
 
   useEffect(() => {
-    let herramienta = cotizaciones.herramientas.find((h) => {
-      return h.defaultState.value !== -1;
-    });
-    if (herramienta) {
-      setCotizaciones({
-        ...cotizaciones,
-        opcionesHerramientas: cotizaciones.opcionesHerramientas.filter(
-          (h) => h.value !== herramienta.idHerramienta
-        ),
+    const fetchOptions = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        Swal.fire(
+          "Alerta",
+          "Debes iniciar sesión para generar una cotización",
+          "warning"
+        );
+        navigate("/HardwareStore/register/user");
+        return; // Detener la ejecución si no hay token
+      }
+
+      const user = jwtDecode(token);
+      setCotizaciones((prev) => ({
+        ...prev,
+        idUser: user.aud,
+      }));
+
+      const herramienta = cotizaciones.herramientas.find((h) => {
+        const existeEnOpciones = cotizaciones.opcionesHerramientas.some(
+          (opcion) => opcion.value === h.id
+        );
+
+        return h.defaultState.value !== -1 && existeEnOpciones;
       });
-    } else {
-      setCotizaciones({
-        ...cotizaciones,
-        opcionesHerramientas: setOptionsSelect("defaultState", herramientas),
-      });
-    }
+
+      if (herramienta) {
+        setCotizaciones((prev) => {
+          return {
+            ...prev,
+            opcionesHerramientas: prev.opcionesHerramientas.filter(
+              (h) => h.value !== herramienta.id
+            ),
+          };
+        });
+      } else {
+        const options = await getOptionsTools();
+        setCotizaciones((prev) => ({
+          ...prev,
+          opcionesHerramientas: setOptionsSelect("defaultState", options),
+        }));
+      }
+    };
+
+    fetchOptions();
   }, [cotizaciones.herramientas]);
+
+  const getHerramientas = async () => {
+    const url =
+      "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/tool/tools";
+    const response = await axios.get(url);
+    return response.data.data;
+  };
 
   const handleChange = (e: any) => {
     if (e.target === undefined) {
       const herramientaParaAgregar: IHerramientasCotizadas = {
         cantidad: 1,
-        precio: 0,
-        idHerramienta: e.value,
+        price: 0,
+        id: e.value,
         defaultState: { value: e.value, label: e.label },
       };
       setCotizaciones({
@@ -69,7 +114,7 @@ const Cotizaciones: React.FC = () => {
   };
   const SetterCantidad = (idHerramienta: number, type: string) => {
     const herramientaEncontrada = cotizaciones.herramientas.find(
-      (h) => h.idHerramienta === idHerramienta
+      (h) => h.id === idHerramienta
     );
     if (type === "add") {
       if (herramientaEncontrada) {
@@ -118,14 +163,14 @@ const Cotizaciones: React.FC = () => {
     } else {
       if (idHerramienta !== -1) {
         const herramientaEncontrada = cotizaciones.herramientas.find(
-          (h) => h.idHerramienta === idHerramienta
+          (h) => h.id === idHerramienta
         );
         if (herramientaEncontrada) {
           setCantidadProducto(cantidadProducto - 1);
           setCotizaciones({
             ...cotizaciones,
             herramientas: cotizaciones.herramientas.filter(
-              (h) => h.idHerramienta !== idHerramienta
+              (h) => h.id !== idHerramienta
             ),
           });
         }
@@ -133,7 +178,7 @@ const Cotizaciones: React.FC = () => {
     }
   };
 
-  const handleGenerateCotization = () => {
+  const handleGenerateCotization = async () => {
     if (cotizaciones.herramientas.length === 0)
       return Swal.fire(
         "Alerta",
@@ -141,45 +186,68 @@ const Cotizaciones: React.FC = () => {
         "warning"
       );
 
-    setShowLoading({ display: "block" });
-    setShowLoading({ display: "block" });
+    try {
+      setShowLoading({ display: "block" });
 
-    setTimeout(() => {
-      setCotizaciones((prevCotizaciones) => {
-        const herramientasActualizadas = ResponseApi.data.map((h) => ({
-          ...h,
-          precio: h.precio,
+      const token = localStorage.getItem("token");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const url =
+        "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/quotes/quote";
+
+      let tools = await getHerramientas();
+
+      const parameters = {
+        idusuario: cotizaciones.idUser,
+        productos: cotizaciones.herramientas.map((h) => {
+          return {
+            idproducto: h.id,
+            cantidad: h.cantidad,
+            total: tools.find((t: any) => t.id === h.id)?.price,
+          };
+        }),
+      };
+
+      const response = await axios.post(url, parameters, { headers });
+
+      if (response.data.status === "200") {
+        const data = response.data.data;
+        setTotalCotizacion(data.total);
+
+        const herramientas = cotizaciones.herramientas.map((h) => ({
+          ...tools.find((t: any) => t.id === h.id),
+          id_quote: data.id_quote,
+          cantidad: h.cantidad,
         }));
-
-        const total = herramientasActualizadas.reduce(
-          (acc, curr) => acc + curr.precio * curr.cantidad,
-          0
-        );
-
-        // Retorna el nuevo estado de cotizaciones
-        return {
-          ...prevCotizaciones,
-          herramientas: herramientasActualizadas,
-        };
-      });
-
-      const total = ResponseApi.data.reduce(
-        (acc, curr) => acc + curr.precio * curr.cantidad,
-        0
-      );
-
-      setTotalCotizacion(total);
-
-      Swal.fire(
-        "Exito",
-        "La cotización se ha generado correctamente",
-        "success"
-      );
+        setBag([...bag, ...herramientas]);
+        Swal.fire("Exito", data.message, "success");
+        setShowLoading({ display: "none" });
+      } else {
+        throw new Error(response.data.error);
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire("Alerta", "Error al generar la cotización", "warning");
       setShowLoading({ display: "none" });
-    }, 2000);
-    //TODO: Generar la cotizacion en la api
+    }
   };
 
+  const getOptionsTools = async () => {
+    const url =
+      "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/tool/toolsoptions";
+
+    try {
+      const response = await axios.get(url);
+      const data = response.data.data;
+      return data;
+    } catch (error) {
+      Swal.fire("Alerta", "Error al obtener las herramientas", "warning");
+      console.log(error);
+      return [];
+    }
+  };
   return (
     <>
       <Loader estilo={showLoading} />
@@ -261,10 +329,7 @@ const Cotizaciones: React.FC = () => {
                   style={{ width: "48px", cursor: "pointer" }}
                   alt="add"
                   onClick={() =>
-                    SetterCantidad(
-                      cotizaciones.herramientas[i]?.idHerramienta,
-                      "add"
-                    )
+                    SetterCantidad(cotizaciones.herramientas[i]?.id, "add")
                   }
                 />
                 <img
@@ -273,21 +338,17 @@ const Cotizaciones: React.FC = () => {
                   style={{ width: "48px", cursor: "pointer" }}
                   alt="sub"
                   onClick={() =>
-                    SetterCantidad(
-                      cotizaciones.herramientas[i]?.idHerramienta,
-                      "sub"
-                    )
+                    SetterCantidad(cotizaciones.herramientas[i]?.id, "sub")
                   }
                 />
                 <label className={styles.input_cantidad}>
-                  Cantidad{" "}
-                  {showCantidad(cotizaciones.herramientas[i]?.idHerramienta)}
+                  Cantidad {showCantidad(cotizaciones.herramientas[i]?.id)}
                 </label>
                 <img
                   onClick={() =>
                     handleCantidadProducto(
                       "sub",
-                      cotizaciones.herramientas[i]?.idHerramienta
+                      cotizaciones.herramientas[i]?.id
                     )
                   }
                   src={IconTrash}
@@ -296,8 +357,8 @@ const Cotizaciones: React.FC = () => {
                   alt="trash"
                 />
                 <label>
-                  {cotizaciones.herramientas[i]?.precio > 0
-                    ? numeral(cotizaciones.herramientas[i]?.precio).format(
+                  {cotizaciones.herramientas[i]?.price > 0
+                    ? numeral(cotizaciones.herramientas[i]?.price).format(
                         "0,0.00"
                       )
                     : ""}
@@ -335,47 +396,3 @@ const Cotizaciones: React.FC = () => {
 };
 
 export default Cotizaciones;
-
-const herramientas = [
-  {
-    value: 1,
-    label: "Pintura pintuco blanca baril",
-  },
-  {
-    value: 2,
-    label: "Pintura pintuco blanca 3lt",
-  },
-  {
-    value: 3,
-    label: "Pintura pintuco blanca 5lt",
-  },
-  {
-    value: 4,
-    label: "Pintura pintuco blanca 10lt",
-  },
-  {
-    value: 5,
-    label: "Cemento gris 50kg",
-  },
-  {
-    value: 6,
-    label: "Cemento blanco Argos 50kg",
-  },
-  {
-    value: 7,
-    label: "Cemento blanco Holcim 50kg",
-  },
-];
-
-const ResponseApi = {
-  status: 200,
-  message: "Cotización generada correctamente",
-  data: herramientas.map((h) => {
-    return {
-      idHerramienta: h.value,
-      cantidad: 1,
-      defaultState: { value: h.value, label: h.label },
-      precio: 25000,
-    };
-  }),
-};

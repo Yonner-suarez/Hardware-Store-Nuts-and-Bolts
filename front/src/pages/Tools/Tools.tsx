@@ -5,12 +5,20 @@ import StarIcon from "../../../assets/iconamoon--star.svg";
 import StarIconHalf from "../../../assets/iconamoon--star-fill.svg";
 import { useBag } from "../../helpers/BagContext";
 import Swal from "sweetalert2";
+import axios from "axios";
 const Tools: React.FC = ({ filtro }: { filtro: boolean }) => {
   const [tools, setTools] = useState([]);
   const { bag, setBag } = useBag();
 
+  const obtenerData = async () => {
+    const url =
+      "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/tool/tools";
+
+    const response = await axios.get(url);
+    setTools(response.data.data);
+  };
   useEffect(() => {
-    setTools(ToolsResponse.data);
+    obtenerData();
   }, []);
 
   const showStars = (puntuacion: number) => {
