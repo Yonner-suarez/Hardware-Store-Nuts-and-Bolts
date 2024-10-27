@@ -28,10 +28,16 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `products` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `price` decimal(10,2) NOT NULL
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL,
+  `marca` VARCHAR(50) NOT NULL,
+  `puntuacion` INT(1) NOT NULL,
+  `code` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
 
 -- --------------------------------------------------------
 
@@ -40,12 +46,16 @@ CREATE TABLE `products` (
 --
 
 CREATE TABLE `quotations` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_quote` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `cantidad` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 -- --------------------------------------------------------
 
@@ -54,65 +64,25 @@ CREATE TABLE `quotations` (
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `tipo_persona` enum('Admin','Permanente','Periódico','Casual','Nuevo') NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(50) NOT NULL,
+  `numeroDocumento` varchar(20) NOT NULL,  -- Cambiar a varchar para permitir diferentes formatos
+  `tipoDocumento` int(5) NOT NULL,
+  `tipoContribuyente` int(5) NOT NULL,
+  `numeroTelefono` varchar(20) NOT NULL,   -- Cambiar a varchar por las mismas razones
+  `departamento` varchar(50) NOT NULL,
+  `ciudad` varchar(50) NOT NULL,
+  `codigoPostal` varchar(10) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Índices para tablas volcadas
---
 
---
--- Indices de la tabla `products`
---
-ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `quotations`
---
-ALTER TABLE `quotations`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `product_id` (`product_id`);
-
---
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `products`
---
-ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `quotations`
---
-ALTER TABLE `quotations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Restricciones para tablas volcadas
---
 
 --
 -- Filtros para la tabla `quotations`

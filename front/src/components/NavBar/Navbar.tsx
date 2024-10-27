@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import IconCotizador from "../../../assets/pajamas--review-list_nabvar.svg";
 import { Link } from "react-router-dom";
 import { useBag } from "../../helpers/BagContext";
+import { jwtDecode } from "jwt-decode";
 
 const Navbar: React.FC = () => {
   const profileImage = "";
@@ -18,8 +19,7 @@ const Navbar: React.FC = () => {
   const [coordenadas, setCoordenadas] = useState({});
   const [ciudad, setCiudad] = useState("");
   const [isPerfil, setIsPerfil] = useState("");
-
-  const correoPrueba = "Julieth Fuentes";
+  const [correoPrueba, setCorreoPrueba] = useState("");
   const obtenerIniciales = (correo: string): void => {
     if (correo === "") {
       setIsPerfil("");
@@ -63,8 +63,26 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     encontrarCoordenadas();
-    obtenerIniciales(correoPrueba);
+    getTokenData();
+    obtenerIniciales(correoPrueba?.split("@")[0] || "");
   }, []);
+
+  const getTokenData = () => {
+    const token = localStorage.getItem("token"); // Suponiendo que tu token está guardado en localStorage
+    if (!token) {
+      return null; // No hay token disponible
+    }
+
+    try {
+      // Decodifica el token
+      const decoded = jwtDecode(token);
+      setIsLogged(true);
+      setCorreoPrueba(decoded.iss);
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+      return null;
+    }
+  };
 
   return (
     <nav className={styles.navbar}>
@@ -173,9 +191,9 @@ const Navbar: React.FC = () => {
                 />
               </Link>
             )}
-            <Link to="/HardwareStore/user/profile">
+            <Link to={isLogged ? "/HardwareStore/user/profile" : "/"}>
               <span className={styles.span_navbar_style} title="Mi cuenta">
-                {isLogged ? "Mi Cuenta" : "Hola " + NameAccount}
+                {!isLogged ? "Mi Cuenta" : "Hola " + NameAccount}
               </span>
             </Link>
           </div>

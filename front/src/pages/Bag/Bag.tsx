@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useBag } from "../../helpers/BagContext";
 import styles from "./Bag.module.css";
 import numeral from "numeral";
@@ -10,9 +10,22 @@ import satisfaccion from "../../../assets/vaadin--medal.svg";
 import ayuda from "../../../assets/icon-park-solid--phone-two.svg";
 import pseIcon from "../../../assets/pse-icon.png";
 import Tool from "../Tools/Tools";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const Bag: React.FC = () => {
   const { bag, setBag } = useBag();
+  const [descuento, setDescuento] = useState(0);
+
+  useEffect(() => {
+    const obtenerDescuento = async () => {
+      const descuento = await getDiscount();
+      if (descuento) {
+        setDescuento(descuento);
+      }
+    };
+    obtenerDescuento();
+  }, []);
 
   const SetterCantidad = (id: number, accion: string) => {
     const newBag = bag.map((t: any) => {
@@ -32,8 +45,86 @@ const Bag: React.FC = () => {
       (acc: any, item: any) => acc + item.price * item.cantidad,
       0
     );
-    return numeral(total).format("0,0.00");
+    return total;
   };
+
+  const calcularDescuento = () => {
+    const total = calcularTotalSub();
+    let descuentoAplicado = 0;
+
+    if (descuento > 0) {
+      descuentoAplicado = total * descuento;
+    }
+
+    if (total > 100000) {
+      const descuentoAdicional = total * 0.02;
+      descuentoAplicado += descuentoAdicional;
+    }
+
+    return descuentoAplicado;
+  };
+
+  const showAlert = (message: string) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+
+    Toast.fire({
+      icon: "success",
+      title: message,
+    });
+  };
+
+  // Agrupar por id_quote
+  const agrupadasPorCotizacion = bag.reduce((acc: any, item: any) => {
+    // Verifica si ya existe el id_quote en el acumulador
+
+    if (!acc[item.id_quote]) {
+      acc[item.id_quote] = []; // Si no existe, inicializa un array
+    }
+    acc[item.id_quote].push(item); // Agrega el elemento al array correspondiente
+    return acc;
+  }, {});
+
+  // Convertir a un array para el mapeo
+  const cotizacionesArray = Object.entries(agrupadasPorCotizacion).map(
+    ([id_quote, items]) => ({
+      id_quote,
+      items,
+    })
+  );
+
+  const getDiscount = async () => {
+    const token = localStorage.getItem("token");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const url = `http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/quotes/ToolsSaleDiscount`;
+      const response = await axios.get(url, { headers });
+      if (response.data.status == "200" && response.data.data > 0) {
+        showAlert(
+          `Estimado cliente por tu confianza en nosotros tienes: ${
+            response.data.data * 100
+          }% de descuento`
+        );
+        return response.data.data;
+      }
+      return null;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.bagContent}>
@@ -41,41 +132,96 @@ const Bag: React.FC = () => {
           {bag.length <= 0 ? (
             <BagEmpty />
           ) : (
-            bag.map((item: any) => (
-              <div key={item.id} className={styles.bagItem}>
-                <img
-                  src={`../../../assets/tools/${item.name}.svg`}
-                  alt={item.name}
-                  style={{ width: "10%" }}
-                />
-                <div className={styles.itemInfo}>
-                  <h4>{item.marca}</h4>
-                  <h6 className={styles.itemName}>{item.name}</h6>
-                  <p>Código:{item.code}</p>
-                </div>
-                <div>
-                  <p className={styles.itemPrice}>
-                    $ {numeral(item.price).format("0,0.00")}
-                  </p>{" "}
+            bag
+              .filter(
+                (item) =>
+                  !cotizacionesArray.some((cot) =>
+                    cot.items.some((i) => i.id === item.id)
+                  )
+              ) // Filtrar los productos que ya están en cotizaciones
+              .map((item) => (
+                <div key={item.id} className={styles.bagItem}>
                   <img
-                    title="Aumentar unidades"
-                    src={AddIcon}
-                    style={{ width: "48px", cursor: "pointer" }}
-                    alt="add"
-                    onClick={() => SetterCantidad(item.id, "add")}
+                    src={`../../../assets/tools/${item.name}.svg`}
+                    alt={item.name}
+                    style={{ width: "10%" }}
                   />
-                  <span>{item.cantidad > 0 ? item.cantidad : 0}</span>
-                  <img
-                    title="Disminuir unidades"
-                    src={RemoveIcon}
-                    style={{ width: "48px", cursor: "pointer" }}
-                    alt="sub"
-                    onClick={() => SetterCantidad(item.id, "sub")}
-                  />
+                  <div className={styles.itemInfo}>
+                    <h4>{item.marca}</h4>
+                    <h6 className={styles.itemName}>{item.name}</h6>
+                    <p>Código: {item.code}</p>
+                  </div>
+                  <div>
+                    <p className={styles.itemPrice}>
+                      $ {numeral(item.price).format("0,0.00")}
+                    </p>
+                    <img
+                      title="Aumentar unidades"
+                      src={AddIcon}
+                      style={{ width: "48px", cursor: "pointer" }}
+                      alt="add"
+                      onClick={() => SetterCantidad(item.id, "add")}
+                    />
+                    <span>{item.cantidad > 0 ? item.cantidad : 0}</span>
+                    <img
+                      title="Disminuir unidades"
+                      src={RemoveIcon}
+                      style={{ width: "48px", cursor: "pointer" }}
+                      alt="sub"
+                      onClick={() => SetterCantidad(item.id, "sub")}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
+
+          {/* Mostrar cotizaciones */}
+          {cotizacionesArray.length > 0 &&
+            cotizacionesArray.map(({ id_quote, items }, index) => (
+              <div key={index}>
+                <hr />
+                <h2>
+                  {id_quote && id_quote !== "undefined" && id_quote !== ""
+                    ? `Cotización # ${id_quote}`
+                    : "Productos sin cotización"}
+                </h2>
+                {items.map((item) => (
+                  <div key={item.id} className={styles.bagItem}>
+                    <img
+                      src={`../../../assets/tools/${item.name}.svg`}
+                      alt={item.name}
+                      style={{ width: "10%" }}
+                    />
+                    <div className={styles.itemInfo}>
+                      <h4>{item.marca}</h4>
+                      <h6 className={styles.itemName}>{item.name}</h6>
+                      <p>Código: {item.code}</p>
+                    </div>
+                    <div>
+                      <p className={styles.itemPrice}>
+                        $ {numeral(item.price).format("0,0.00")}
+                      </p>
+                      <img
+                        title="Aumentar unidades"
+                        src={AddIcon}
+                        style={{ width: "48px", cursor: "pointer" }}
+                        alt="add"
+                        onClick={() => SetterCantidad(item.id, "add")}
+                      />
+                      <span>{item.cantidad > 0 ? item.cantidad : 0}</span>
+                      <img
+                        title="Disminuir unidades"
+                        src={RemoveIcon}
+                        style={{ width: "48px", cursor: "pointer" }}
+                        alt="sub"
+                        onClick={() => SetterCantidad(item.id, "sub")}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+
           <hr style={{ border: "2px solid black" }} />
           <h5>Productos similares</h5>
           <Tool filtro={false} />
@@ -88,13 +234,36 @@ const Bag: React.FC = () => {
           <div>
             <div className={styles.summaryItem}>
               <h6 className={styles.summaryTitle}>Subtotal</h6>
-              <p className={styles.summaryItemPrice}>$ {calcularTotalSub()}</p>
+              <p className={styles.summaryItemPrice}>
+                $ {numeral(calcularTotalSub()).format("0,0.00")}
+              </p>
             </div>
 
             <hr style={{ border: "2px solid black" }} />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <span
+                style={{
+                  color: "black",
+                  fontFamily: "normal",
+                  textAlign: "start",
+                }}
+              >
+                Si la compra supera los $100.000 tienes un 2% de descuento
+                adicional
+              </span>
+            </div>
+
+            <div className={styles.summaryItem}>
+              <h6 className={styles.summaryTitle}>Descuento</h6>
+              <p className={styles.summaryItemPrice}>
+                $ {numeral(calcularDescuento()).format("0,0.00")}
+              </p>
+            </div>
             <div className={styles.summaryItem}>
               <h6 className={styles.summaryTitle}>Total</h6>
-              <p className={styles.summaryItemPrice}>$ {calcularTotalSub()}</p>
+              <p className={styles.summaryItemPrice}>
+                $ {numeral(calcularTotalSub()).format("0,0.00")}
+              </p>
             </div>
             <p style={{ color: "black", fontFamily: "normal" }}>
               El coste de envío no está incluido en el total

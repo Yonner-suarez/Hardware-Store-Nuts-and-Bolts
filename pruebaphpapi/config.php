@@ -19,9 +19,9 @@ if (file_exists($envFile)) {
 }
 
 $host = $envVariables['HOST'] ?? 'localhost'; 
-$dbName = $envVariables['DB_NAME'] ?? 'hardware_store';
+$dbName = $envVariables['DB_NAME'] ?? 'hardware_nuts_db';
 $dbUser = $envVariables['DB_USER'] ?? 'root'; 
-$dbPassword = $envVariables['DB_PASSWORD'] ?? '12345678'; 
+$dbPassword = $envVariables['DB_PASSWORD'] ?? 'JudaSaki2916*'; 
 $dbPort = $envVariables['DB_PORT'] ?? '3306'; 
 $jwtKey = $envVariables['JWT_KEY'] ?? 'your_jwt_secret';
 $jwtExp = $envVariables['JWT_EXP'] ?? 3600;

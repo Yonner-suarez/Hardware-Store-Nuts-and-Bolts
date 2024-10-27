@@ -8,6 +8,10 @@ require_once(__DIR__ . "/Routes/Router.php");
 require_once(__DIR__ . "/config.php");
 require_once(__DIR__ . "/infraestructure/middleware.php");
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 try{
   $router = new Router();
   $response = $router->matchRoute($uri);
@@ -23,6 +27,7 @@ try{
 //Esto permite que el .htaccess funcione
 
 
+//httpd.conf
 //<Directory /ruta/a/tu/sitio/web>
 //    AllowOverride All
 //</Directory>
