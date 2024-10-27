@@ -216,11 +216,18 @@ const Cotizaciones: React.FC = () => {
         const data = response.data.data;
         setTotalCotizacion(data.total);
 
-        const herramientas = cotizaciones.herramientas.map((h) => ({
-          ...tools.find((t: any) => t.id === h.id),
-          id_quote: data.id_quote,
-          cantidad: h.cantidad,
-        }));
+        const herramientas: IBag[] = data.quote.map((h: any) => {
+          return {
+            id: h.productid,
+            name: h.productname,
+            price: h.total,
+            marca: h.productmarca,
+            code: h.productcode,
+            id_quote: h.quoteid,
+            cantidad: h.cantidad,
+          };
+        });
+
         setBag([...bag, ...herramientas]);
         Swal.fire("Exito", data.message, "success");
         setShowLoading({ display: "none" });

@@ -5,23 +5,46 @@ import Navbar from "./components/NavBar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Cotizaciones from "./pages/cotizaciones/Cotizaciones";
 import Loader from "./components/Loader/Loader";
-import { getTokenFromLocalStorage } from "./helpers/function";
 import Home from "./pages/Home/Home";
 import ModalRegister from "./components/ModalRegister/ModalRegister";
 import Tools from "./pages/Tools/Tools";
 import Bag from "./pages/Bag/Bag";
 import Profile from "./pages/Profile/Profile";
+import { useBag } from "./helpers/BagContext";
+import { traerBag } from "./helpers/function";
 function App() {
+  const { bag, setBag } = useBag();
   const [showLoading, setShowLoading] = useState({ display: "none" });
 
-  async function getToken() {
-    const token = await getTokenFromLocalStorage();
-    setShowLoading({ display: "none" });
-  }
+  const ejecutarFunciones = async () => {
+    const token = localStorage.getItem("token");
 
+    if (token) {
+      // Verificar si el token ha expirado
+      const tokenData = JSON.parse(atob(token.split(".")[1]));
+      const expirationTime = tokenData.exp * 1000;
+
+      if (Date.now() >= expirationTime) {
+        localStorage.removeItem("token");
+      }
+    }
+
+    const aux = async () => {
+      const herramientas = await traerBag();
+      setBag(herramientas);
+    };
+
+    aux();
+  };
   useEffect(() => {
-    setShowLoading({ display: "block" });
-    getToken();
+    ejecutarFunciones();
+
+    const intervalo = setInterval(ejecutarFunciones, 5000);
+
+    // Limpia el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalo);
+
+    //setShowLoading({ display: "block" });
   }, []);
 
   return (
