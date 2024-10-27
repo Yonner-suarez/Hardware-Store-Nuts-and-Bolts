@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   }, []);
   return (
     <>
-      <ModalRegisterLogin />
+      <ModalRegisterLogin modalRef={modalRef} />
       <CarruselHomePage />
       <TipoProductos />
     </>

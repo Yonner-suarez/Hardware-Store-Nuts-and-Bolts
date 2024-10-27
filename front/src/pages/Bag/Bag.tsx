@@ -248,6 +248,31 @@ const Bag: React.FC = () => {
                     title="Eliminar Producto"
                     alt="trash"
                   />
+                  <div className={styles.itemInfo}>
+                    <h4>{item.marca}</h4>
+                    <h6 className={styles.itemName}>{item.name}</h6>
+                    <p>Código: {item.code}</p>
+                  </div>
+                  <div>
+                    <p className={styles.itemPrice}>
+                      $ {numeral(item.price).format("0,0.00")}
+                    </p>
+                    <img
+                      title="Aumentar unidades"
+                      src={AddIcon}
+                      style={{ width: "48px", cursor: "pointer" }}
+                      alt="add"
+                      onClick={() => SetterCantidad(item.id, "add")}
+                    />
+                    <span>{item.cantidad > 0 ? item.cantidad : 0}</span>
+                    <img
+                      title="Disminuir unidades"
+                      src={RemoveIcon}
+                      style={{ width: "48px", cursor: "pointer" }}
+                      alt="sub"
+                      onClick={() => SetterCantidad(item.id, "sub")}
+                    />
+                  </div>
                 </div>
               ))
           )}

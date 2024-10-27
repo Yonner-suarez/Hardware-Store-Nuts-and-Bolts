@@ -64,10 +64,22 @@ CREATE TABLE `quotations` (
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `tipo_persona` enum('Admin','Permanente','Periódico','Casual','Nuevo') NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(50) NOT NULL,
+  `numeroDocumento` varchar(20) NOT NULL,  -- Cambiar a varchar para permitir diferentes formatos
+  `tipoDocumento` int(5) NOT NULL,
+  `tipoContribuyente` int(5) NOT NULL,
+  `numeroTelefono` varchar(20) NOT NULL,   -- Cambiar a varchar por las mismas razones
+  `departamento` varchar(50) NOT NULL,
+  `ciudad` varchar(50) NOT NULL,
+  `codigoPostal` varchar(10) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
   `numeroDocumento` varchar(20) NOT NULL,  -- Cambiar a varchar para permitir diferentes formatos
