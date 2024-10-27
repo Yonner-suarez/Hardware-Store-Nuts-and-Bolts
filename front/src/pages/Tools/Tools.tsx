@@ -6,6 +6,7 @@ import StarIconHalf from "../../../assets/iconamoon--star-fill.svg";
 import { useBag } from "../../helpers/BagContext";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 const Tools: React.FC = ({ filtro }: { filtro: boolean }) => {
   const [tools, setTools] = useState([]);
   const { bag, setBag } = useBag();
@@ -35,7 +36,7 @@ const Tools: React.FC = ({ filtro }: { filtro: boolean }) => {
     return stars;
   };
 
-  const agregarAlCarrito = (tool: any) => {
+  const agregarAlCarrito = async (tool: any) => {
     const findtool = bag.some((item: any) => item.id === tool.id);
 
     if (findtool) {
@@ -54,11 +55,59 @@ const Tools: React.FC = ({ filtro }: { filtro: boolean }) => {
         }
       });
     }
+
+    const token = localStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
+
     let toolaux = {
-      ...tool,
+      idusuario: decodedToken.aud,
+      idproducto: tool.id,
       cantidad: 1,
     };
-    setBag([...bag, toolaux]);
+
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    const url =
+      "http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/quotes/addToBag";
+    const response = await axios.post(url, toolaux, { headers });
+
+    if (response.data.status === "200") {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+
+      Toast.fire({
+        icon: "success",
+        title: response.data.message,
+      });
+    } else {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+
+      Toast.fire({
+        icon: "error",
+        title: "Algo inesperado ocurrio",
+      });
+    }
   };
 
   return (

@@ -143,3 +143,30 @@ export const disableButton = (form: any) => {
     form.confirmPassword
   );
 };
+
+export const traerBag = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const url = `http://localhost/Hardware-Store-Nuts-and-Bolts/pruebaphpapi/quotes/getBagTotal`;
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = response.data.data;
+    const herramientas: IBag[] = data.map((h: any) => {
+      return {
+        id: h.productid,
+        name: h.productname,
+        price: h.total,
+        marca: h.productmarca,
+        code: h.productcode,
+        id_quote: h.id_quote,
+        cantidad: h.cantidad,
+      };
+    });
+    return herramientas;
+  } catch (error) {
+    console.log(error);
+  }
+};

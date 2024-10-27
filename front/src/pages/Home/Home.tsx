@@ -9,34 +9,34 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const modalElement = document.getElementById("exampleModal");
 
     if (!token) {
-      const modalElement = document.getElementById("exampleModal");
       if (modalElement) {
         modalRef.current = new Modal(modalElement);
         modalRef.current.show();
-
-        modalElement.addEventListener("hidden.bs.modal", () => {
-          // Cleanup on modal close
-          document.body.classList.remove("modal-open");
-          const backdrop = document.querySelector(".modal-backdrop");
-          if (backdrop) {
-            backdrop.remove();
-          }
-        });
-        // Limpiar el efecto cuando el componente se desmonte
-        return () => {
-          if (modalRef.current) {
-            modalRef.current.hide(); // Asegúrate de que esto se llama
-          }
-          document.body.classList.remove("modal-open");
-          const backdrop = document.querySelector(".modal-backdrop");
-          if (backdrop) {
-            backdrop.remove();
-          }
-        };
       }
     }
+    const handleModalHidden = () => {
+      // Cleanup on modal close
+      document.body.classList.remove("modal-open");
+      document.body.style.overflow = "auto"; // Asegúrate de restablecer el scroll
+      const backdrop = document.querySelector(".modal-backdrop");
+      if (backdrop) {
+        backdrop.remove();
+      }
+    };
+
+    modalElement?.addEventListener("hidden.bs.modal", handleModalHidden);
+
+    // Limpiar el efecto cuando el componente se desmonte
+    return () => {
+      if (modalRef.current) {
+        modalRef.current.hide();
+      }
+      handleModalHidden(); // Asegúrate de limpiar estilos al desmontar
+      modalElement?.removeEventListener("hidden.bs.modal", handleModalHidden);
+    };
   }, []);
   return (
     <>

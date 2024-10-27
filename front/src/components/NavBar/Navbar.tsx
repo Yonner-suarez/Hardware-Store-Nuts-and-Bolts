@@ -4,7 +4,7 @@ import ubicacion from "../../../assets/basil--map-location-outline.svg";
 import account from "../../../assets/mdi--account.svg";
 import shoppingBag from "../../../assets/ic--baseline-shopping-bag.svg";
 import styles from "./NavBar.module.css";
-import { obtenerNombreCiudad } from "../../helpers/function";
+import { obtenerNombreCiudad, traerBag } from "../../helpers/function";
 import Swal from "sweetalert2";
 import IconCotizador from "../../../assets/pajamas--review-list_nabvar.svg";
 import { Link } from "react-router-dom";
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const { bag } = useBag();
+  const { bag, setBag } = useBag();
 
   const handleSearch = () => {
     // TODO: Implementar la búsqueda de productos
@@ -60,11 +60,13 @@ const Navbar: React.FC = () => {
         })
     );
   };
-
-  useEffect(() => {
-    encontrarCoordenadas();
+  const ejecutarFunciones = async () => {
+    await encontrarCoordenadas();
     getTokenData();
     obtenerIniciales(correoPrueba?.split("@")[0] || "");
+  };
+  useEffect(() => {
+    ejecutarFunciones();
   }, []);
 
   const getTokenData = () => {

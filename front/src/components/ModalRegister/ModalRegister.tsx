@@ -66,6 +66,19 @@ const ModalRegister: React.FC = () => {
         TipoContribuyente
       ),
     });
+    return () => {
+      // Solo ejecuta la limpieza si el modal estaba abierto
+      if (document.body.classList.contains("modal-open")) {
+        document.body.classList.remove("modal-open", "overflow-hidden");
+        document.body.style.overflow = "auto";
+
+        // Elimina el backdrop residual si existe
+        const backdrop = document.querySelector(".modal-backdrop");
+        if (backdrop) {
+          backdrop.remove();
+        }
+      }
+    };
   }, []);
 
   const handleShowPassword = (type: string) => {
@@ -146,7 +159,7 @@ const ModalRegister: React.FC = () => {
         },
       });
 
-      if (response.data.code === 200) {
+      if (response.data.status === "200") {
         Swal.fire("Registro exitoso", "Tu cuenta ha sido creada", "success");
       } else {
         Swal.fire("Error", response.data.error, "error");
